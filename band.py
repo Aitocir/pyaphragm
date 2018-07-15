@@ -20,16 +20,20 @@ class Instrument:
             self._introlen = 0.0
             self._introcurve = 1.0
             self._introdecay = False
+            self._introframes = 0
         else:
             self._introlen = definition['buildup']['length'] if 'length' in definition['buildup'] else 0.0
             self._introcurve = definition['buildup']['curve'] if 'curve' in definition['buildup'] else 1.0
             self._introdecay = definition['buildup']['decays'] if 'decays' in definition['buildup'] else False
+            self._introframes = int(self._introlen * self._fps)
         if 'cutaway' not in definition:
             self._cutlen = 0.0
             self._cutcurve = 1.0
+            self._cutframes = 0
         else:
             self._cutlen = definition['cutaway']['length'] if 'length' in definition['cutaway'] else 0.0
             self._cutcurve = definition['cutaway']['curve'] if 'curve' in definition['cutaway'] else 1.0
+            self._cutframes = int(self._cutlen * self._fps)
         if 'waves' in definition:
             self._waves = definition['waves']
         else:
@@ -84,9 +88,9 @@ class Instrument:
     def _wave(self, freq, mult, frame_count, wavefunc):
         subwave = []
         for i in range(frame_count):
-            intro = self._buildup_mult(i)
-            decay = self._decay_mult(i)
-            cut = self._cut_mult(frame_count-i)
+            intro = self._buildup_mult(i) if i < self._introframes else 1
+            decay = self._decay_mult(i) if self._decayrate > 0 else 1
+            cut = self._cut_mult(frame_count-i) if frame_count-i < self._cutframes else 1
             wave = wavefunc(freq, i)
             if self._vibrato['cents'] > 0:
                 basewave = wavefunc(freq, i)

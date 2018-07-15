@@ -25,11 +25,57 @@ for thing in instrument_defs:
 
 
 start = time.time()
+"""
 sound = array.array('h')
 for step in range(6):
     note = instruments['whistle'].play_note(587.33*(2**(step/12)), 44100)
     for n in note:
         sound.append(int(n))
+"""
+
+note_C = 440 * (2**(3/12))
+note_D = 440 * (2**(5/12))
+note_E = 440 * (2**(7/12))
+note_G = 440 * (2**(10/12))
+
+music = []
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+music.extend(instruments['whistle'].play_note(note_C, 22050))
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_E, 44100))
+
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+music.extend(instruments['whistle'].play_note(note_D, 44100))
+
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_G, 22050))
+music.extend(instruments['whistle'].play_note(note_G, 44100))
+
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+music.extend(instruments['whistle'].play_note(note_C, 22050))
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+music.extend(instruments['whistle'].play_note(note_E, 22050))
+music.extend(instruments['whistle'].play_note(note_D, 22050))
+
+music.extend(instruments['whistle'].play_note(note_C, 88200))
+
+sound = array.array('h')
+sound.extend([int(x) for x in music])
+
 print(time.time()-start)
 
 a = sa.WaveObject(sound, 1, 2, 44100)

@@ -27,12 +27,12 @@
         "period": 1
     },
     "buildup": {
-        "length": 0.05,
+        "length": 0.1,
         "curve": 1.0,
         "decays": false
     },
     "cutaway": {
-        "length": 0.05,
+        "length": 0.1,
         "curve": 1.0
     },
     "sine": {
@@ -40,7 +40,7 @@
         "harmonics": [0, -9, -2.5, -31, -22, -34, -33, -44]
     },
     "vibrato": {
-        "frequency": 4,
+        "frequency": 0.5,
         "cents": 1
     },
     "tremolo": {
