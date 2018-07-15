@@ -1,6 +1,6 @@
 import json
 import sys
-
+import time
 import array
 import math
 import simpleaudio as sa
@@ -24,11 +24,13 @@ for thing in instrument_defs:
 #
 
 
-
+start = time.time()
 sound = array.array('h')
-note = instrument.play_note(440, 88200)
-for n in note:
-    sound.append(int(n))
+for step in range(6):
+    note = instruments['whistle'].play_note(587.33*(2**(step/12)), 44100)
+    for n in note:
+        sound.append(int(n))
+print(time.time()-start)
 
 a = sa.WaveObject(sound, 1, 2, 44100)
 b = a.play()
