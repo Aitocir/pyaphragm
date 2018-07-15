@@ -121,6 +121,7 @@ class Instrument:
     def name(self):
         return self._name
     def play_note(self, frequency, frame_count):
+        frame_count = int(frame_count)
         fullwave = [0 for _ in range(frame_count)]
         for wave in self._waves:
             wavefunc = self._wf[wave['type']]
