@@ -24,6 +24,12 @@ class Instrument:
             self._introlen = definition['buildup']['length'] if 'length' in definition['buildup'] else 0.0
             self._introcurve = definition['buildup']['curve'] if 'curve' in definition['buildup'] else 1.0
             self._introdecay = definition['buildup']['decays'] if 'decays' in definition['buildup'] else False
+        if 'cutaway' not in definition:
+            self._cutlen = 0.0
+            self._cutcurve = 1.0
+        else:
+            self._cutlen = definition['cutaway']['length'] if 'length' in definition['cutaway'] else 0.0
+            self._cutcurve = definition['cutaway']['curve'] if 'curve' in definition['cutaway'] else 1.0
         if 'waves' in definition:
             self._waves = definition['waves']
         else:
@@ -39,7 +45,7 @@ class Instrument:
             wave['weight'] /= denom
     def _buildup_mult(self, fidx): 
         ftime = fidx / self._fps
-        if ftime >= self._introlen:
+        if ftime >= self._introlen:  #  TODO: test, but I don't think this is necessary with the min() on the return (same for self._cut_mult())
             return 1.0
         x = ftime / self._introlen
         return min(1.0, x ** self._introcurve)
@@ -57,6 +63,12 @@ class Instrument:
         else:
             raise ValueError('Invalid decay type: "{0}"'.format(self._decaytype))
         return max(0, d)
+    def _cut_mult(self, fnidx):
+        cendtime = fnidx / self._fps 
+        if cendtime > self._cutlen:
+            return 1.0
+        x = cendtime / self._cutlen
+        return min(1.0, x ** self._cutcurve)
     #
     #  Waveform functions
     #  https://en.wikipedia.org/wiki/Waveform
@@ -74,6 +86,7 @@ class Instrument:
         for i in range(frame_count):
             intro = self._buildup_mult(i)
             decay = self._decay_mult(i)
+            cut = self._cut_mult(frame_count-i)
             wave = wavefunc(freq, i)
             if self._vibrato['cents'] > 0:
                 basewave = wavefunc(freq, i)
@@ -89,7 +102,7 @@ class Instrument:
                 volume = (tremf * basedyn) + ((1-tremf) * lowdyn)
             else:
                 volume = self.volume()
-            v = wave * volume * mult * intro * decay
+            v = wave * volume * mult * intro * decay * cut
             subwave.append(v)
         return subwave
     def volume(self):
