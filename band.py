@@ -87,6 +87,8 @@ class Instrument:
                 tremwave = self._sine(self._tremolo['frequency'], i)
                 tremf = (tremwave+1.0) / 2.0
                 volume = (tremf * basedyn) + ((1-tremf) * lowdyn)
+            else:
+                volume = self.volume()
             v = wave * volume * mult * intro * decay
             subwave.append(v)
         return subwave
