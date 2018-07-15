@@ -6,6 +6,7 @@ class Instrument:
         self._volume = 1.0
         self._name = definition['name']
         self._wf = {'sine': self._sine, 'square': self._square, 'triangle': self._tri, 'sawtooth': self._saw}
+        self._vibrato = {"cents": 0, "frequency": 0} if 'vibrato' not in definition else definition['vibrato']
         if 'decay' not in definition:
             self._decaytime = 1.0
             self._decayrate = 0.0
@@ -73,6 +74,12 @@ class Instrument:
             intro = self._buildup_mult(i)
             decay = self._decay_mult(i)
             wave = wavefunc(freq, i)
+            if self._vibrato['cents'] > 0:
+                basewave = wavefunc(freq, i)
+                otherwave = wavefunc(freq + (2**(self._vibrato['cents']/1200)), i)
+                vibwave = self._sine(self._vibrato['frequency'], i)
+                vibf = (vibwave+1.0) / 2.0
+                wave = (vibf * (basewave)) + ((1-vibf) * otherwave)
             v = wave * self.volume() * mult * intro * decay
             subwave.append(v)
         return subwave

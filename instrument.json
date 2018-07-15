@@ -27,13 +27,17 @@
         "period": 1
     },
     "buildup": {
-        "length": 0.1,
+        "length": 0.01,
         "curve": 1.0,
         "decays": false
     },
     "sine": {
         "weight": 1,
         "harmonics": [0, -9, -2.5, -31, -22, -34, -33, -44]
+    },
+    "vibrato": {
+        "frequency": 2,
+        "cents": 100
     }
 },
 {
