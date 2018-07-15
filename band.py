@@ -41,9 +41,15 @@ class Instrument:
             for wavetype in ['sine', 'triangle', 'sawtooth', 'square']:
                 if wavetype in definition:
                     w = definition[wavetype]['weight'] if 'weight' in definition[wavetype] else 1.0
-                    for i in range(len(definition[wavetype]['harmonics'])):
-                        harmonic_str = 10 ** (definition[wavetype]['harmonics'][i]/10)
-                        self._waves.append({'type': wavetype, 'harmonic': i+1, 'weight': w*harmonic_str})
+                    if 'harmonics' in definition[wavetype]:
+                        for i in range(len(definition[wavetype]['harmonics'])):
+                            harmonic_str = 10 ** (definition[wavetype]['harmonics'][i]/10)
+                            self._waves.append({'type': wavetype, 'harmonic': i+1, 'weight': w*harmonic_str})
+                    if 'overtones' in definition[wavetype]:
+                        for mult in definition[wavetype]['overtones']:
+                            overtone = definition[wavetype]['overtones'][mult]
+                            harmonic_str = 10 ** (overtone/10)
+                            self._waves.append({'type': wavetype, 'harmonic': float(mult), 'weight': w*harmonic_str})
         denom = sum([x['weight'] for x in self._waves])
         for wave in self._waves:
             wave['weight'] /= denom

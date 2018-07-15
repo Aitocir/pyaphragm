@@ -66,64 +66,17 @@ for step in range(6):
         sound.append(int(n))
 """
 
-
-note_C = 440 * (2**(3/12))
-note_D = 440 * (2**(5/12))
-note_E = 440 * (2**(7/12))
-note_G = 440 * (2**(10/12))
-
-music = []
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-music.extend(instruments['whistle'].play_note(note_C, 22050))
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_E, 44100))
-
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-music.extend(instruments['whistle'].play_note(note_D, 44100))
-
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_G, 22050))
-music.extend(instruments['whistle'].play_note(note_G, 44100))
-
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-music.extend(instruments['whistle'].play_note(note_C, 22050))
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-music.extend(instruments['whistle'].play_note(note_E, 22050))
-music.extend(instruments['whistle'].play_note(note_D, 22050))
-
-music.extend(instruments['whistle'].play_note(note_C, 88200))
-
-sound = array.array('h')
-sound.extend([int(x) for x in music])
-
 sound1 = array.array('h')
 reader = MusicReader()
 instructions = reader.parse_music('E5Q D5Q C5Q D5Q   E5Q E5Q E5H   D5Q D5Q D5H   E5Q G5Q G5H   E5Q D5Q C5Q D5Q   E5Q E5Q E5Q E5Q   D5Q D5Q E5Q D5Q   C5W')
-BPM = 120
+BPM = 180
 FPS = 44100
+music = []
 for cmd in instructions:
     #  TODO: handle more than notes
-    sound1.extend([int(x) for x in instruments['whistle'].play_note(cmd['frequency'], (60/BPM)*FPS*(cmd['beats']))])
-
+    music.extend(instruments['whistle'].play_note(cmd['frequency'], (60/BPM)*FPS*(cmd['beats'])))
+sound1.extend([int(x) for x in music])
 print(time.time()-start)
-
-a = sa.WaveObject(sound, 1, 2, FPS)
-b = a.play()
-b.wait_done()
 
 a = sa.WaveObject(sound1, 1, 2, FPS)
 b = a.play()
