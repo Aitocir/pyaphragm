@@ -8,6 +8,7 @@ class Instrument:
         self._wf = {'sine': self._sine, 'square': self._square, 'triangle': self._tri, 'sawtooth': self._saw}
         self._vibrato = {"cents": 0, "frequency": 0} if 'vibrato' not in definition else definition['vibrato']
         self._tremolo = {"drop": 0, "frequency": 0} if 'tremolo' not in definition else definition['tremolo']
+        self._legato = False
         if 'decay' not in definition:
             self._decaytime = 1.0
             self._decayrate = 0.0
@@ -94,9 +95,10 @@ class Instrument:
     def _wave(self, freq, mult, frame_count, wavefunc):
         subwave = []
         for i in range(frame_count):
-            intro = self._buildup_mult(i) if i < self._introframes else 1
+            intro = self._buildup_mult(i) if i < self._introframes and not self._legato else 1
             decay = self._decay_mult(i) if self._decayrate > 0 else 1
-            cut = self._cut_mult(frame_count-i) if frame_count-i < self._cutframes else 1
+            cut = self._cut_mult(frame_count-i) if not self._legato and frame_count-i < self._cutframes else 1
+            legato = min(1, ((frame_count-i) / (self._fps / 32)) ** 0.5, (i / (self._fps / 32)) ** 0.5) if self._legato else 1
             wave = wavefunc(freq, i)
             if self._vibrato['cents'] > 0:
                 basewave = wavefunc(freq, i)
@@ -112,7 +114,7 @@ class Instrument:
                 volume = (tremf * basedyn) + ((1-tremf) * lowdyn)
             else:
                 volume = self.volume()
-            v = wave * volume * mult * intro * decay * cut
+            v = wave * volume * mult * intro * decay * cut * legato
             subwave.append(v)
         return subwave
     def volume(self):
@@ -120,6 +122,20 @@ class Instrument:
     def set_volume(self, volume):
         if 0 < volume <= 1:
             self._volume = volume
+    def legato(self):
+        return self._legato
+    def set_legato(self, islegato):
+        """
+        if not self._legato and islegato:
+            self._origcutframes = self._cutframes
+            self._origcutcurve = self._cutcurve
+            self._cutframes = int(self._fps / 50)
+            self._cutcurve = 1.0
+        elif self._legato and not islegato:
+            self._cutframes = self._origcutframes
+            self._cutcurve = self._origcutcurve
+        """
+        self._legato = islegato
     def fps(self):
         return self._fps
     def set_fps(self, fps):

@@ -76,9 +76,12 @@ for part in composition['parts']:
     instrument_name = composition['parts'][part]
     instructions = reader.parse_music(composition['score'][part])
     musics.append([])
+    count = 0
     for cmd in instructions:
         #  TODO: handle more than notes
         musics[-1].extend(instruments[instrument_name].play_note(cmd['frequency'], (60/BPM)*FPS*cmd['beats']))
+        count += 1
+        instruments[instrument_name].set_legato(count > 12)
 
 score_len = min([len(x) for x in musics])
 for i in range(score_len):

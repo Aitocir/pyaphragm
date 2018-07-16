@@ -1,6 +1,6 @@
 {
     "name": "Mary Had a Little Lamb",
-    "bpm": 400,
+    "bpm": 180,
     "dynamic": "f",
     "parts": {
         "melody": "whistle",
