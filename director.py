@@ -13,6 +13,7 @@ class MusicReader:
         self._undotted = 'DWHQESTF'
         self._dotted = 'DWHQESTF'.lower()
         self._thirds = '36248'
+        self._dynamics = ['ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff']
     def _freq_for_note(self, letter, index):
         nidx = ((int(index)*12)+12) + self._notenames.index(letter)
         return 440 * (2 ** ((nidx-69)/12))
@@ -38,6 +39,10 @@ class MusicReader:
             signal['frequency'] = self._freq_for_note(note[0], note[1])
             signals.append(signal)
         return signals
+    def read_dynamic(self, dynamic):
+        if dynamic not in self._dynamics:
+            return 0
+        return (self._dynamics.index(dynamic) + 1) / 8
 
 #
 #  Band setup 
@@ -51,6 +56,9 @@ for thing in instrument_defs:
     instrument = Instrument(thing)
     instruments[instrument.name()] = instrument
 
+with open(sys.argv[2]) as f:
+    composition = json.loads(f.read())
+
 #
 #  Music reading
 #
@@ -58,24 +66,24 @@ for thing in instrument_defs:
 
 start = time.time()
 
-"""
-sound = array.array('h')
-for step in range(6):
-    note = instruments['whistle'].play_note(587.33*(2**(step/12)), 44100)
-    for n in note:
-        sound.append(int(n))
-"""
-
 sound1 = array.array('h')
 reader = MusicReader()
-instructions = reader.parse_music('E5Q D5Q C5Q D5Q   E5Q E5Q E5H   D5Q D5Q D5H   E5Q G5Q G5H   E5Q D5Q C5Q D5Q   E5Q E5Q E5Q E5Q   D5Q D5Q E5Q D5Q   C5W')
-BPM = 180
+BPM = composition['bpm']
 FPS = 44100
-music = []
-for cmd in instructions:
-    #  TODO: handle more than notes
-    music.extend(instruments['whistle'].play_note(cmd['frequency'], (60/BPM)*FPS*(cmd['beats'])))
-sound1.extend([int(x) for x in music])
+volume = reader.read_dynamic(composition['dynamic'])
+musics = []
+for part in composition['parts']:
+    instrument_name = composition['parts'][part]
+    instructions = reader.parse_music(composition['score'][part])
+    musics.append([])
+    for cmd in instructions:
+        #  TODO: handle more than notes
+        musics[-1].extend(instruments[instrument_name].play_note(cmd['frequency'], (60/BPM)*FPS*cmd['beats']))
+
+score_len = min([len(x) for x in musics])
+for i in range(score_len):
+    sound1.append(int(sum([x[i] for x in musics]) / len(musics)))
+
 print(time.time()-start)
 
 a = sa.WaveObject(sound1, 1, 2, FPS)

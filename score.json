@@ -1,0 +1,13 @@
+{
+    "name": "Mary Had a Little Lamb",
+    "bpm": 400,
+    "dynamic": "f",
+    "parts": {
+        "melody": "whistle",
+        "bass": "xylophone"
+    },
+    "score": {
+        "melody": "E5Q D5Q C5Q D5Q   E5Q E5Q E5H   D5Q D5Q D5H   E5Q G5Q G5H   E5Q D5Q C5Q D5Q   E5Q E5Q E5Q E5Q   D5Q D5Q E5Q D5Q   C5W",
+        "bass": "E1H     E1H       E1H     E1H   E1H     E1H   E1H     E1H   E1H     E1H       E1H     E1H       E1H     E1H       E1H     E1H"
+    }
+}
