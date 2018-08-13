@@ -2,6 +2,64 @@
     "name": "whistle",
     "decay": {
         "type": "exponential",
+        "rate": 0.1,
+        "period": 1
+    },
+    "buildup": {
+        "length": 0.05,
+        "curve": 0.50,
+        "decays": false
+    },
+    "cutaway": {
+        "length": 0.025,
+        "curve": 5.0
+    },
+    "sine": {
+        "weight": 1,
+        "harmonics": [0, -9, -2.5, -31, -22, -34, -33, -44]
+    },
+    "vibrato": {
+        "frequency": 0.5,
+        "cents": 1
+    },
+    "tremolo": {
+        "frequency": 16,
+        "drop": 0.1
+    }
+},
+{
+    "name": "whistle1",
+    "decay": {
+        "type": "exponential",
+        "rate": 0.01,
+        "period": 1
+    },
+    "buildup": {
+        "length": 0.01,
+        "curve": 0.50,
+        "decays": false
+    },
+    "cutaway": {
+        "length": 0.01,
+        "curve": 5.0
+    },
+    "sine": {
+        "weight": 1,
+        "harmonics": [0, -9, -2.5, -31, -22, -34, -33, -44]
+    },
+    "vibrato": {
+        "frequency": 0.5,
+        "cents": 1
+    },
+    "tremolo": {
+        "frequency": 16,
+        "drop": 0.1
+    }
+},
+{
+    "name": "voice",
+    "decay": {
+        "type": "exponential",
         "rate": 0.0,
         "period": 1
     },
@@ -16,10 +74,7 @@
     },
     "sine": {
         "weight": 1,
-        "harmonics": [0, -9, -2.5, -31, -22, -34, -33, -44],
-        "overtones": {
-            "1.59": -7
-        }
+        "harmonics": [-10, -12, -21, -36, -40, -42, -52, -59, -55, -55, -51, -38, -26, -24, -27, -25, -28, -25, -28, -47, -48, -48, -66, -75, -78, -75, -63, -63, -64, -55, -56, -62, -61, -67, -57]
     },
     "vibrato": {
         "frequency": 0.5,
@@ -35,6 +90,31 @@
     "decay": {
         "type": "exponential",
         "rate": 0.99,
+        "period": 1
+    },
+    "buildup": {
+        "length": 0.01,
+        "curve": 1.0,
+        "decays": false
+    },
+    "cutaway": {
+        "length": 0.01,
+        "curve": 1.0
+    },
+    "sine": {
+        "weight": 1,
+        "overtones": {
+            "1": 0,
+            "2.3": 0,
+            "3.6": 0
+        }
+    }
+},
+{
+    "name": "bass drum",
+    "decay": {
+        "type": "exponential",
+        "rate": 0.995,
         "period": 1
     },
     "buildup": {

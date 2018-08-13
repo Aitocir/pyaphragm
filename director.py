@@ -3,8 +3,10 @@ import sys
 import time
 import array
 import math
+import wave
 import simpleaudio as sa
 
+import pyximport; pyximport.install()
 from band import Instrument
 
 class MusicReader:
@@ -15,6 +17,8 @@ class MusicReader:
         self._thirds = '36248'
         self._dynamics = ['ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff']
     def _freq_for_note(self, letter, index):
+        if letter in set('rR'):
+            return 0
         nidx = ((int(index)*12)+12) + self._notenames.index(letter)
         return 440 * (2 ** ((nidx-69)/12))
     def _beats_for_length(self, length):
@@ -63,7 +67,6 @@ with open(sys.argv[2]) as f:
 #  Music reading
 #
 
-
 start = time.time()
 
 sound1 = array.array('h')
@@ -91,4 +94,13 @@ print(time.time()-start)
 
 a = sa.WaveObject(sound1, 1, 2, FPS)
 b = a.play()
+
+with wave.open(sys.argv[3], mode='wb') as f:
+    f.setframerate(FPS)
+    f.setnchannels(1)
+    f.setsampwidth(2)
+    f.writeframes(sound1)
+    
+
 b.wait_done()
+

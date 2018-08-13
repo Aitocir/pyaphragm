@@ -3,7 +3,7 @@
     "bpm": 180,
     "dynamic": "f",
     "parts": {
-        "melody": "whistle",
+        "melody": "voice",
         "bass": "xylophone"
     },
     "score": {

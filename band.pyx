@@ -1,7 +1,12 @@
 import math
+from libc.math cimport sin
+
+cpdef double sine(double freq, int fidx, int fps):
+    return sin((2 * fidx * math.pi * freq) / fps)
 
 class Instrument:
     def __init__(self, definition):
+        self._notecache = {}
         self._fps = 44100
         self._volume = 1.0
         self._name = definition['name']
@@ -68,7 +73,8 @@ class Instrument:
             return 1.0
         x = dtime / self._decaytime
         if self._decaytype == 'exponential':
-            d = (1 - self._decayrate) ** x
+            #d = (1 - x) ** self._decayrate if x < 1 else 0
+            d = (1-self._decayrate) ** x  #2 - (self._decayrate ** -x)
         elif self._decaytype == 'linear':
             d = 1 - (x * self._decayrate)
         else:
@@ -85,15 +91,19 @@ class Instrument:
     #  https://en.wikipedia.org/wiki/Waveform
     #
     def _sine(self, freq, fidx):
-        return math.sin((2 * fidx * math.pi * freq) / self._fps)
+        #  return sin((2 * fidx * math.pi * freq) / self._fps)
+        return sine(freq, fidx, self._fps)
     def _square(self, freq, fidx):
         return 1.0 if self._sine(freq, fidx) > 0.0 else -1.0 
     def _tri(self, freq, fidx):
-        return (2/math.pi) * math.asin(math.sin((2 * fidx * math.pi * freq) / self._fps))
+        return (2/math.pi) * math.asin(sin((2 * fidx * math.pi * freq) / self._fps))
     def _saw(self, freq, fidx):
         return (2/math.pi) * math.atan(math.tan((fidx * math.pi * freq) / self._fps))
     def _wave(self, freq, mult, frame_count, wavefunc):
-        subwave = []
+        if freq == 0:
+            return [0 for _ in range(frame_count)]
+        cdef list subwave = []
+        cdef double v, wave, intro, decay, cut, legato, basewave, otherwave, vibwave, vibf, basedyn, lowdyn, tremwave, tremf, volume
         for i in range(frame_count):
             intro = self._buildup_mult(i) if i < self._introframes and not self._legato else 1
             decay = self._decay_mult(i) if self._decayrate > 0 else 1
@@ -103,13 +113,13 @@ class Instrument:
             if self._vibrato['cents'] > 0:
                 basewave = wavefunc(freq, i)
                 otherwave = wavefunc(freq + (2**(self._vibrato['cents']/1200)), i)
-                vibwave = self._sine(self._vibrato['frequency'], i)
+                vibwave = sine(self._vibrato['frequency'], i, self._fps)
                 vibf = (vibwave+1.0) / 2.0
                 wave = (vibf * basewave) + ((1-vibf) * otherwave)
             if self._tremolo['drop'] > 0:
                 basedyn = self.volume()
                 lowdyn = self.volume() - self._tremolo['drop']
-                tremwave = self._sine(self._tremolo['frequency'], i)
+                tremwave = sine(self._tremolo['frequency'], i, self._fps)
                 tremf = (tremwave+1.0) / 2.0
                 volume = (tremf * basedyn) + ((1-tremf) * lowdyn)
             else:
@@ -143,10 +153,13 @@ class Instrument:
     def name(self):
         return self._name
     def play_note(self, frequency, frame_count):
+        if (frequency, frame_count) in self._notecache:
+            return self._notecache[(frequency, frame_count)]
         frame_count = int(frame_count)
         fullwave = [0 for _ in range(frame_count)]
         for wave in self._waves:
             wavefunc = self._wf[wave['type']]
             subwave = self._wave(frequency*wave['harmonic'], 32767*wave['weight'], frame_count, wavefunc)
             fullwave = [fullwave[x]+subwave[x] for x in range(len(subwave))]
+        self._notecache[(frequency, frame_count)] = fullwave
         return fullwave
